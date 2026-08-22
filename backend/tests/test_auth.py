@@ -1,55 +1,9 @@
-import pytest
 import jwt
-from fastapi.testclient import TestClient
+
 from app.auth.security import SECRET_KEY
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
-from app.database import Base, get_db
-from app.main import app
 
 
-TEST_DATABASE_URL = "sqlite://"
-
-
-engine = create_engine(
-    TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool
-)
-
-TestingSessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
-
-
-Base.metadata.create_all(bind=engine)
-
-
-def override_get_db():
-    db = TestingSessionLocal()
-
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-client = TestClient(app)
-
-
-@pytest.fixture(autouse=True)
-def reset_database():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-
-def test_register_user():
+def test_register_user(client):
     response = client.post(
         "/api/auth/register",
         json={
@@ -67,7 +21,7 @@ def test_register_user():
     assert data["email"] == "test@example.com"
 
 
-def test_register_user_with_duplicate_email():
+def test_register_user_with_duplicate_email(client):
     client.post(
         "/api/auth/register",
         json={
@@ -89,7 +43,8 @@ def test_register_user_with_duplicate_email():
     assert response.status_code == 400
     assert response.json()["detail"] == "Email already registered"
 
-def test_login_user():
+
+def test_login_user(client):
     client.post(
         "/api/auth/register",
         json={
@@ -114,7 +69,8 @@ def test_login_user():
     assert "access_token" in data
     assert data["token_type"] == "bearer"
 
-def test_login_with_wrong_password():
+
+def test_login_with_wrong_password(client):
     client.post(
         "/api/auth/register",
         json={
@@ -135,7 +91,8 @@ def test_login_with_wrong_password():
     assert response.status_code == 401
     assert response.json()["detail"] == "Invalid email or password"
 
-def test_login_returns_valid_jwt():
+
+def test_login_returns_valid_jwt(client):
     client.post(
         "/api/auth/register",
         json={
