@@ -86,3 +86,28 @@ def test_register_user_with_duplicate_email():
 
     assert response.status_code == 400
     assert response.json()["detail"] == "Email already registered"
+
+def test_login_user():
+    client.post(
+        "/api/auth/register",
+        json={
+            "username": "loginuser",
+            "email": "login@example.com",
+            "password": "password123"
+        }
+    )
+
+    response = client.post(
+        "/api/auth/login",
+        json={
+            "email": "login@example.com",
+            "password": "password123"
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
