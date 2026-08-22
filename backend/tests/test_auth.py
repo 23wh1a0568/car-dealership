@@ -1,5 +1,7 @@
 import pytest
+import jwt
 from fastapi.testclient import TestClient
+from app.auth.security import SECRET_KEY
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -111,3 +113,56 @@ def test_login_user():
 
     assert "access_token" in data
     assert data["token_type"] == "bearer"
+
+def test_login_with_wrong_password():
+    client.post(
+        "/api/auth/register",
+        json={
+            "username": "wrongpassuser",
+            "email": "wrongpass@example.com",
+            "password": "correctpassword"
+        }
+    )
+
+    response = client.post(
+        "/api/auth/login",
+        json={
+            "email": "wrongpass@example.com",
+            "password": "wrongpassword"
+        }
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Invalid email or password"
+
+def test_login_returns_valid_jwt():
+    client.post(
+        "/api/auth/register",
+        json={
+            "username": "jwtuser",
+            "email": "jwt@example.com",
+            "password": "password123"
+        }
+    )
+
+    response = client.post(
+        "/api/auth/login",
+        json={
+            "email": "jwt@example.com",
+            "password": "password123"
+        }
+    )
+
+    assert response.status_code == 200
+
+    token = response.json()["access_token"]
+
+    payload = jwt.decode(
+        token,
+        SECRET_KEY,
+        algorithms=["HS256"]
+    )
+
+    assert "sub" in payload
+    assert "role" in payload
+    assert payload["role"] == "user"
