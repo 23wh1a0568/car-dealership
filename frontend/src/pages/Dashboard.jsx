@@ -10,7 +10,8 @@ function Dashboard() {
   const [vehicles, setVehicles] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  const [search, setSearch] = useState("")
+  const [make, setMake] = useState("")
+  const [model, setModel] = useState("")
   const [category, setCategory] = useState("")
   const [user, setUser] = useState(null)
 
@@ -22,47 +23,55 @@ function Dashboard() {
         setError("Please login first")
         return
       }
+
       const currentUser = await getCurrentUser(token)
       setUser(currentUser)
+
       const data = await getVehicles(token)
       setVehicles(data)
+
     } catch (error) {
       setError(error.message)
     } finally {
       setLoading(false)
     }
   }
+
   async function handleSearch() {
     try {
-        setLoading(true)
-        setError("")
+      setLoading(true)
+      setError("")
 
-        const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token")
 
-        const data = await searchVehicles(token, {
-        make: search,
+      const data = await searchVehicles(token, {
+        make: make,
+        model: model,
         category: category
-        })
+      })
 
-        setVehicles(data)
+      setVehicles(data)
+
     } catch (error) {
-        setError(error.message)
+      setError(error.message)
     } finally {
-        setLoading(false)
+      setLoading(false)
     }
   }
+
   async function handlePurchase(vehicleId) {
     try {
-        const token = localStorage.getItem("token")
+      const token = localStorage.getItem("token")
 
-        await purchaseVehicle(token, vehicleId)
+      await purchaseVehicle(token, vehicleId)
 
-        await loadVehicles()
+      await loadVehicles()
 
     } catch (error) {
-        setError(error.message)
+      setError(error.message)
     }
   }
+
   useEffect(() => {
     loadVehicles()
   }, [])
@@ -107,43 +116,60 @@ function Dashboard() {
         <p className="text-gray-600 mt-2">
           Browse available vehicles
         </p>
-            {user && (
-            <p className="text-sm text-gray-500 mt-1">
-                Logged in as: {user.role}
-            </p>
-            )}
+
+        {user && (
+          <p className="text-sm text-gray-500 mt-1">
+            Logged in as: {user.role}
+          </p>
+        )}
+
+        {/* Search */}
         <div className="mt-6 bg-white p-4 rounded-xl shadow-sm">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
-                type="text"
-                placeholder="Search by make..."
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                className="border rounded-lg px-4 py-3"
-                />
 
-                <select
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
-                className="border rounded-lg px-4 py-3"
-                >
-                <option value="">All Categories</option>
-                <option value="Sedan">Sedan</option>
-                <option value="SUV">SUV</option>
-                <option value="Hatchback">Hatchback</option>
-                <option value="Truck">Truck</option>
-                </select>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-                <button
-                onClick={handleSearch}
-                className="bg-black text-white rounded-lg px-4 py-3 font-semibold"
-                >
-                Search
-                </button>
+            {/* Make */}
+            <input
+              type="text"
+              placeholder="Search by make..."
+              value={make}
+              onChange={(event) => setMake(event.target.value)}
+              className="border rounded-lg px-4 py-3"
+            />
 
-            </div>
+            {/* Model */}
+            <input
+              type="text"
+              placeholder="Search by model..."
+              value={model}
+              onChange={(event) => setModel(event.target.value)}
+              className="border rounded-lg px-4 py-3"
+            />
 
-            </div>
+            {/* Category */}
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              className="border rounded-lg px-4 py-3"
+            >
+              <option value="">All Categories</option>
+              <option value="Sedan">Sedan</option>
+              <option value="SUV">SUV</option>
+              <option value="Hatchback">Hatchback</option>
+              <option value="Truck">Truck</option>
+            </select>
+
+            {/* Search Button */}
+            <button
+              onClick={handleSearch}
+              className="bg-black text-white rounded-lg px-4 py-3 font-semibold"
+            >
+              Search
+            </button>
+
+          </div>
+
+        </div>
 
         {error && (
           <div className="mt-6 bg-red-100 text-red-700 p-4 rounded-lg">

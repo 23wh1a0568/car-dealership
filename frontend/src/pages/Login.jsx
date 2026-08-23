@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { loginUser } from "../services/api"
+import { jwtDecode } from "jwt-decode"
 
 function Login() {
   const navigate = useNavigate()
@@ -19,10 +20,15 @@ function Login() {
         email,
         password,
       })
-
       localStorage.setItem("token", data.access_token)
 
-      navigate("/dashboard")
+      const decoded = jwtDecode(data.access_token)
+
+      if (decoded.role === "admin") {
+        navigate("/admin")
+      } else {
+        navigate("/dashboard")
+      }
     } catch (error) {
       setError(error.message)
     }
