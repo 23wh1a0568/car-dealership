@@ -136,23 +136,18 @@ pytest
 ### Test Report
 
 The complete test suite was executed successfully.
+
+```text
 ====================== test session starts ======================
-platform win32 -- Python 3.14.2, pytest-9.1.1, pluggy-1.6.0
-rootdir: C:\Users\yasuj\OneDrive\Desktop\car-dealership\backend
-configfile: pytest.ini
-testpaths: tests
+platform win32 -- Python 3.14.2
 collected 27 items
 
-tests\test_auth.py .....                                   [ 18%]
-tests\test_vehicles.py ......................              [100%]
-
-======================= warnings summary ========================
-
-StarletteDeprecationWarning:
-Using httpx with starlette.testclient is deprecated;
-install httpx2 instead.
+tests\test_auth.py .....                    [ 18%]
+tests\test_vehicles.py .................... [100%]
 
 ================ 27 passed, 1 warning in 10.19s =================
+```
+
 ### Test Result
 
 27 tests passed successfully.
