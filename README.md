@@ -16,7 +16,9 @@ A full-stack car dealership management application with a FastAPI backend and Re
 - Stock management
 - Vehicle restocking
 - Protected frontend routes
-- Admin and user dashboards
+- Admin dashboard
+- User dashboard
+- Automatic role-based login redirection
 - Automated backend tests
 
 ## Tech Stack
@@ -94,7 +96,7 @@ http://127.0.0.1:8000
 
 ### API Documentation
 
-FastAPI provides interactive Swagger documentation at:
+Interactive FastAPI Swagger documentation is available at:
 
 ```text
 http://127.0.0.1:8000/docs
@@ -166,7 +168,7 @@ Regular users can:
 - Access protected resources
 - Log out
 
-After successful login, regular users are redirected to:
+After successful login, regular users are automatically redirected to:
 
 ```text
 http://localhost:5173/dashboard
@@ -185,7 +187,7 @@ Administrators can:
 - Manage dealership inventory
 - Log out
 
-After successful login, administrators are redirected to:
+After successful login, administrators are automatically redirected to:
 
 ```text
 http://localhost:5173/admin
@@ -201,7 +203,7 @@ Users can search and filter the vehicle inventory using:
 - Model
 - Category
 
-Multiple filters can be combined to narrow down the search results.
+Multiple filters can be combined to narrow down search results.
 
 For example:
 
@@ -211,11 +213,11 @@ Model: RAV4
 Category: SUV
 ```
 
-The backend processes these filters using the vehicle search API.
+The backend processes these filters through the vehicle search API.
 
 ## Vehicle Management
 
-The admin dashboard provides inventory management functionality.
+The admin dashboard provides vehicle inventory management functionality.
 
 Administrators can:
 
@@ -237,8 +239,9 @@ The local database file is excluded from Git using `.gitignore`.
 
 The backend provides REST API endpoints for:
 
-- Authentication
-- User management
+- User registration
+- User login
+- User authentication
 - Vehicle management
 - Vehicle search
 - Vehicle inventory
