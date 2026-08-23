@@ -17,3 +17,18 @@ frontend/node_modules/
 
 # Frontend build
 frontend/dist/
+
+# Testing
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
