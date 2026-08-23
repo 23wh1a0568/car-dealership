@@ -93,7 +93,8 @@ def search_vehicles(
 def update_vehicle(
     vehicle_id: int,
     vehicle_data: VehicleUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(require_admin)
 ):
     vehicle = db.query(Vehicle).filter(
         Vehicle.id == vehicle_id

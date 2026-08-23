@@ -1,5 +1,5 @@
-def test_create_vehicle(authenticated_client):
-    response = authenticated_client.post(
+def test_create_vehicle(admin_client):
+    response = admin_client.post(
         "/api/vehicles",
         json={
             "make": "Toyota",
@@ -161,8 +161,8 @@ def test_search_vehicles_by_price_range(authenticated_client):
     assert data[0]["make"] == "Toyota"
 
 
-def test_update_vehicle(authenticated_client):
-    create_response = authenticated_client.post(
+def test_update_vehicle(admin_client):
+    create_response = admin_client.post(
         "/api/vehicles",
         json={
             "make": "Toyota",
@@ -175,7 +175,7 @@ def test_update_vehicle(authenticated_client):
 
     vehicle_id = create_response.json()["id"]
 
-    response = authenticated_client.put(
+    response = admin_client.put(
         f"/api/vehicles/{vehicle_id}",
         json={
             "make": "Toyota",
@@ -196,8 +196,8 @@ def test_update_vehicle(authenticated_client):
     assert data["quantity"] == 7
 
 
-def test_update_nonexistent_vehicle(authenticated_client):
-    response = authenticated_client.put(
+def test_update_nonexistent_vehicle(admin_client):
+    response = admin_client.put(
         "/api/vehicles/9999",
         json={
             "make": "Toyota",
@@ -401,3 +401,129 @@ def test_restock_nonexistent_vehicle(admin_client):
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Vehicle not found"
+
+def test_create_vehicle_requires_admin(client):
+    response = client.post(
+        "/api/vehicles",
+        json={
+            "make": "Toyota",
+            "model": "Camry",
+            "category": "Sedan",
+            "price": 30000,
+            "quantity": 5
+        }
+    )
+
+    assert response.status_code == 401
+
+def test_admin_can_update_vehicle(admin_client):
+    create_response = admin_client.post(
+        "/api/vehicles",
+        json={
+            "make": "Toyota",
+            "model": "Camry",
+            "category": "Sedan",
+            "price": 30000,
+            "quantity": 5
+        }
+    )
+
+    assert create_response.status_code == 201
+
+    vehicle_id = create_response.json()["id"]
+
+    response = admin_client.put(
+        f"/api/vehicles/{vehicle_id}",
+        json={
+            "make": "Toyota",
+            "model": "Camry Hybrid",
+            "category": "Sedan",
+            "price": 35000,
+            "quantity": 7
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["model"] == "Camry Hybrid"
+    assert data["price"] == 35000
+    assert data["quantity"] == 7
+
+def test_user_cannot_update_vehicle(authenticated_client):
+    create_response = authenticated_client.post(
+        "/api/vehicles",
+        json={
+            "make": "Toyota",
+            "model": "Camry",
+            "category": "Sedan",
+            "price": 30000,
+            "quantity": 5
+        }
+    )
+
+    vehicle_id = create_response.json()["id"]
+
+    response = authenticated_client.put(
+        f"/api/vehicles/{vehicle_id}",
+        json={
+            "make": "Toyota",
+            "model": "Camry Hybrid",
+            "category": "Sedan",
+            "price": 35000,
+            "quantity": 7
+        }
+    )
+
+    assert response.status_code == 403
+
+def test_admin_can_restock_vehicle(admin_client):
+    create_response = admin_client.post(
+        "/api/vehicles",
+        json={
+            "make": "Honda",
+            "model": "Civic",
+            "category": "Sedan",
+            "price": 25000,
+            "quantity": 5
+        }
+    )
+
+    vehicle_id = create_response.json()["id"]
+
+    response = admin_client.post(
+        f"/api/vehicles/{vehicle_id}/restock",
+        json={
+            "quantity": 10
+        }
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["quantity"] == 15
+
+def test_user_cannot_restock_vehicle(authenticated_client):
+    create_response = authenticated_client.post(
+        "/api/vehicles",
+        json={
+            "make": "Honda",
+            "model": "Civic",
+            "category": "Sedan",
+            "price": 25000,
+            "quantity": 5
+        }
+    )
+
+    vehicle_id = create_response.json()["id"]
+
+    response = authenticated_client.post(
+        f"/api/vehicles/{vehicle_id}/restock",
+        json={
+            "quantity": 10
+        }
+    )
+
+    assert response.status_code == 403
