@@ -84,3 +84,42 @@ install httpx2 instead.
 ### Test Result
 
 27 tests passed successfully.
+
+
+## Screenshots
+
+### Login
+
+![Login](screenshots/login.png)
+
+### Registration
+
+![Registration](screenshots/register.png)
+
+### User Dashboard
+
+![User Dashboard](screenshots/user-dashboard.png)
+
+### Admin Dashboard
+
+![Admin Dashboard](screenshots/admin-dashboard.png)
+
+### Vehicle Search
+
+![Vehicle Search](screenshots/vehicle-search.png)
+
+### Vehicle Purchase
+
+![Vehicle Purchase](screenshots/vehicle-purchase.png)
+
+### Admin Edit
+
+![Admin Edit](screenshots/admin-edit.png)
+
+### Admin Restock
+
+![Admin Restock](screenshots/admin-restock.png)
+
+### Admin Delete
+
+![Admin Delete](screenshots/admin-delete.png)
